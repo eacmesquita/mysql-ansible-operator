@@ -1,0 +1,32 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: mysql-pv-vol1
+  namespace: default
+  labels:
+    type: local
+    app: mysql
+spec:
+  storageClassName: local-storage
+  capacity:
+     storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/mnt/data"
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: mysql-pvc-vol1
+  namespace: default
+  labels:
+    type: local
+    app: mysql
+spec:
+  storageClassName: local-storage
+  resources:
+    requests:
+      storage: 1Gi
+  accessModes:
+    - ReadWriteMany

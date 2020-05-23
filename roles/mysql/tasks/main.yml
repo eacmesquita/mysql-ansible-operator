@@ -1,0 +1,53 @@
+---
+- name: start mysql
+  k8s:
+    definition:
+      kind: Deployment
+      apiVersion: v1
+      metadata:
+        name: '{{ meta.name }}-mysql'
+        namespace: '{{ meta.namespace }}'
+      spec:
+        replicas: "{{size}}"
+        selector:
+          matchLabels:
+            app: mysql
+        template:
+          metadata:
+            labels:
+              app: mysql
+          spec:
+            containers:
+            - name: mysql
+              image: "mysql:5.6"
+              ports:
+              - containerPort: 3306
+              env:
+              - name: MYSQL_ROOT_PASSWORD
+                value: password
+              volumeMounts:
+              - name: mysql-data
+                mountPath: "/var/lib/mysql"
+            volumes:
+            - name: mysql-data
+              persistentVolumeClaim:
+                claimName: mysql-pvc-vol1
+
+- name: Create the  service
+  k8s:
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: service
+        namespace: '{{ meta.namespace }}'
+        labels:
+          app: mysql
+      spec:
+        ports:
+        - name: database
+          port: 3306
+          protocol: TCP
+          targetPort: 3306
+        selector:
+          app: mysql
